@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+	<head>
+	</head>
+	<body>
+	
+		<div id="container" style="width: 800px; height: 600px; border: 1px solid #cccccc;">
+		</div>
+	
+		<br /><br />
+		
+		<select id="list">
+			<option value="1">1 Gear</option>
+			<option value="10">10 Gears</option>
+		</select>
+		<button id="btnGo">Go!</button>
+		<span id="label"></span>
+	
+		<script type="text/javascript" src="../gearbox.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+		<script type="text/javascript">
+			
+			var objectCount = 0;
+			
+			function generateObject() {
+			
+				objectCount++;				
+				var obj = $("#container").append('<div id="object_'+objectCount+'" style="font-weight: bold; text-align: center; position: absolute; top: '+(objectCount%4 + 1)+'00px; left: '+(objectCount%4 + 1)+'00px; padding: 5px; background-color: orange; border-radius: 5px; border: 1px solid #aaaaaa; width: 20px; height: 20px; box-shadow: 2px 2px 2px #555555;">'+objectCount+'</div>').find("#object_"+objectCount);
+				obj.css('background-color', 'red');
+				
+				var curr_top = '+';
+				var curr_left = '-';
+				
+				setInterval(function() {				
+				
+					var pos = obj.offset();
+
+					if (pos.left > 800)
+						curr_left = '-';
+					else if (pos.left < 10)
+						curr_left = '+';
+
+					if (pos.top > 600)
+						curr_top = '-';
+					else if (pos.top < 10)
+						curr_top = '+';						
+				
+					var gear = gearbox.get("demo").currentGear();
+					
+					if (gear < 10) {
+						obj.animate({
+							left: curr_left+'=30',
+							top: curr_top+'=30'
+						}, 500-50*(gear-1), 'linear');
+					}
+					else {
+						obj.offset({ top: pos.top + (curr_top == "+" ? 30 : -30), left: pos.left + (curr_left == "+" ? 30 : -30) });
+					}
+					
+				}, 500);
+			};
+			
+			var metric_count = 0;
+			
+			$(function() {
+			
+				$('#btnGo').click(function() {
+				
+					var gear = gearbox.create('demo', 1000, 50, $('#list').val());
+				
+					gear.on('shift', function() {
+						alert(this.currentGear());
+					});
+				
+					var loop = setInterval(function() {
+						generateObject();										
+
+						if (objectCount >= 200)
+							clearInterval(loop);
+
+					}, 200);
+					
+					setInterval(function() {
+
+						metric_count++;
+					
+						$('#label').text(gear.performance() + "ms delay, tracking " + objectCount + " objects @ gear #" + gear.currentGear() + " (" + metric_count + ")");
+												
+					}, 500);
+				});
+			});
+			
+		</script>
+		
+	</body>
+</html>
