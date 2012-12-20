@@ -1,2 +1,2 @@
-throttle.js
+gearbox.js
 ===========
