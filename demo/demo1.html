@@ -67,11 +67,18 @@
 			
 				$('#btnGo').click(function() {
 				
-					var gear = gearbox.create('demo', 1000, 50, $('#list').val());
-				
-					gear.on('shift', function() {
-						alert(this.currentGear());
-					});
+					var gear = gearbox.create('demo', 1000, {
+						increment: {
+							delay_above: 50,
+							duration: 1
+						},
+						decrement: {
+							delay_below: 40,
+							duration: 2
+						}
+					}, 1, $('#list').val());
+					
+					gearbox.all.stop();
 				
 					var loop = setInterval(function() {
 						generateObject();										
@@ -87,6 +94,9 @@
 					
 						$('#label').text(gear.performance() + "ms delay, tracking " + objectCount + " objects @ gear #" + gear.currentGear() + " (" + metric_count + ")");
 												
+						if (metric_count % 100 == 0 && metric_count > 0)
+							gearbox.save();
+							
 					}, 500);
 				});
 			});
